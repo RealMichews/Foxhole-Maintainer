@@ -66,10 +66,6 @@ async def add_bunker(ctx, *args):
     !add_bunker NAME GSUPP_PER_HOUR CURRENT_GSUPPS
     Example:
     !add_bunker SOSIG_HQ 100 5000
-
-    :param ctx:
-    :param args:
-    :return:
     '''
 
     db = sqlite3.connect('foxdb.db')
