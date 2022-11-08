@@ -440,7 +440,7 @@ async def list_bunkers(ctx, *args):
 
 
 
+with open('iamsosecure.txt') as f:
+    content = f.readlines()[0]
 
-
-
-bot.run('MTAzODM3NTA0ODc4NTk2NTA4Ng.Gwbm6m.NJcbUwVaezB6tgAvm_pqg6_DTnSmZR6uXH9uCY')
+bot.run(content)
