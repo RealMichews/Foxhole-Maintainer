@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 from discord.utils import get
 import sqlite3
 import time
@@ -309,6 +310,7 @@ async def delete_bunker(ctx, *args):
             await ctx.send('Please use only one argument (Bunker name)')
 
 
+@tasks.loop(minutes=5)
 @bot.command()
 async def list_bunkers(ctx, *args):
 
