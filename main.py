@@ -324,7 +324,7 @@ async def list_bunkers(ctx, *args):
             await ctx.send(f'Showing bunkers for the current war {currentWar}')
             for bunker in result:
                 await ctx.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                               f'Supplies per hour')
+                               f'Supplies per hour.')
         if len(args) == 1:
             try:
                 tmp = int(args[0])
@@ -334,7 +334,7 @@ async def list_bunkers(ctx, *args):
                 await ctx.send(f'Showing bunkers for the war {args[0]}')
                 for bunker in result:
                     await ctx.send(f'{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                                   f'Supplies per hour')
+                                   f'Supplies per hour.')
             except:
                 await ctx.send('Please use a number.')
 
