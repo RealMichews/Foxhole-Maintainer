@@ -164,14 +164,16 @@ async def add_bunker(ctx, *args):
                 tmp = int(args[2])
                 # Searching next ID to insert new Bunker
                 ID = generate_ID()
+                timestamp = calculate_timestamp(args[1], args[2])
                 # Inserting into DB
                 query = f'INSERT INTO TBUNKER (ID, NAME, WAR, HOURLY_USAGE, EXPIRY_DATE) VALUES ({ID}, \'{name}\', ' \
-                        f'\'{currentWar}\', \'{args[1]}\', \'{args[2]}\')'
+                        f'\'{currentWar}\', \'{args[1]}\', \'{timestamp}\')'
                 cursor.execute(query)
                 db.commit()
                 db.close()
-                await ctx.send(f'{ctx.author} has created the new bunker {args[0]} with a Garrison Supply consumption of '
-                               f'{args[1]} per hour. It is currently stocked with {args[2]} Garrison Supplies')
+                await ctx.send(f'{ctx.author} has created the new bunker {args[0]} with a Garrison Supply consumption '
+                               f'of {args[1]} per hour. With the current amount of {args[2]} Garrison Supplies it is '
+                               f'maintained until <t:{timestamp}:f>')
             except:
                 await ctx.send('Please use a number for the hourly usage and amount of garrison supplies.')
 
@@ -257,8 +259,8 @@ async def update_gsupps(ctx, *args):
                     tmp = int(args[1])
                     hourlyUsage = check_hourly_usage(name)
                     timestamp = calculate_timestamp(hourlyUsage, gsupps)
-                    query = f'UPDATE TBUNKER SET HOURLY_USAGE = \'{hourlyUsage}\', EXPIRY_DATE = \'{timestamp}\' WHERE NAME = ' \
-                            f'\'{name}\' AND WAR = \'{currentWar}\''
+                    query = f'UPDATE TBUNKER SET HOURLY_USAGE = \'{hourlyUsage}\', EXPIRY_DATE = \'{timestamp}\' ' \
+                            f'WHERE NAME = \'{name}\' AND WAR = \'{currentWar}\''
                     cursor.execute(query)
                     db.commit()
                     db.close()
@@ -267,8 +269,6 @@ async def update_gsupps(ctx, *args):
                         f'Garrison Supplies it is maintained until <t:{timestamp}:f>')
                 except:
                     await ctx.send('Please use a number for the amount of garrison supplies.')
-
-
 
 
 @bot.command()
@@ -294,7 +294,6 @@ async def delete_bunker(ctx, *args):
 
                 def check_name(name):
                     query = f'SELECT * FROM TBUNKER WHERE NAME = \'{name}\' AND WAR = \'{currentWar}\''
-                    print (query)
                     cursor.execute(query)
                     return cursor.fetchall()
 
@@ -302,7 +301,6 @@ async def delete_bunker(ctx, *args):
                     await ctx.send(f'The bunker {name} does not exist.')
                 else:
                     query = f'DELETE FROM TBUNKER WHERE NAME = \'{name}\' AND WAR = \'{currentWar}\''
-                    print (query)
                     cursor.execute(query)
                     db.commit()
                     db.close()
