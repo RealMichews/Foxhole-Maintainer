@@ -19,11 +19,11 @@ currentWar = cursor.fetchall()[0][0]
 db.close()
 
 # Tester
-#target_channel_id = 1038474625224540251
+target_channel_id = 1038474625224540251
 
 
 # Sosig
-target_channel_id = 1038473765513855006
+#target_channel_id = 1038473765513855006
 
 
 def calculate_timestamp(hourlyUsage, gsupps):
