@@ -19,11 +19,11 @@ currentWar = cursor.fetchall()[0][0]
 db.close()
 
 # Tester
-target_channel_id = 1038474625224540251
+#target_channel_id = 1038474625224540251
 
 
 # Sosig
-# target_channel_id = 1038473765513855006
+target_channel_id = 1038473765513855006
 
 
 def calculate_timestamp(hourlyUsage, gsupps):
@@ -45,11 +45,11 @@ async def helpme(ctx, *args):
     if channel in ["test", "maintenance-bot"]:
         if len(args) == 0:
             await ctx.send(f'These are the currently available commands:\n\n'
-                           f'!add_bunker - This command adds a new bunker and can take between 1 to 3 parameters. Syntax:\n'
-                           f'!add_bunker NAME GSUPP/H GSUPPAMOUNT - Just Name OR Name + gsupp/H are possible\n'
+                           f'!add_bunker - This command adds a new bunker and can take between 1 to 3 parameters. '
+                           f'Syntax:\n!add_bunker NAME GSUPP/H GSUPPAMOUNT - Just Name OR Name + gsupp/H are possible\n'
                            f'When naming a bunker only use one continuous string. OK: SOSIG_HQ NOK: SOSIG HQ\n\n'
-                           f'!update_bunker - This command updates an existing bunker - only takes 3 parameters. Syntax:\n'
-                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT\n\n'
+                           f'!update_bunker - This command updates an existing bunker - only takes 3 parameters. '
+                           f'Syntax:\n!update_bunker NAME GSUPP/H GSUPPAMOUNT\n\n'
                            f'!update_gsupps - This command lets you update the gsupp amount for an existing bunker - '
                            f'only takes 2 parameters. Syntax:\n'
                            f'!update_gsupps NAME GSUPPAMOUNT\n\n'
