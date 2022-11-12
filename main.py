@@ -415,7 +415,10 @@ async def auto_list_bunkers():
     for bunker in result:
         currentTime = int(time.time())
         if bunker[3] and bunker[4]:
-            if bunker[4] - currentTime < 3600:
+            if bunker[4] - currentTime < 0:
+                await channel.send(
+                    f'\n{bunker[1]} is actively decaying since <t:{bunker[4]}:f> :bangbang:')
+            elif bunker[4] - currentTime < 3600:
                 await channel.send(
                     f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
                     f'Supplies per hour. :red_circle:')
