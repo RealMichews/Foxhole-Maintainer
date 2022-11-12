@@ -444,6 +444,54 @@ async def auto_list_bunkers():
     db.close()
 
 
+@bot.command()
+async def test_embed():
+    channel = bot.get_channel(target_channel_id)
+    db = sqlite3.connect('foxdb.db')
+    cursor = db.cursor()
+    query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
+    cursor.execute(query)
+    result = cursor.fetchall()
+    title = f'Hourly Maintenance Update'
+    description = f'Showing bunkers for the current war {currentWar}'
+    embed = discord.Embed(title=title, description=description)
+    gsupptotal = 0
+    for bunker in result:
+        currentTime = int(time.time())
+        if bunker[3] and bunker[4]:
+            if bunker[4] - currentTime < 0:
+                name = f'{bunker[1]}:bangbang:'
+                text = f'Actively decaying since <t:{bunker[4]}:f>'
+                embed.add_field(name=name,  value=text)
+            elif bunker[4] - currentTime < 3600:
+                text = f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
+                       f'Supplies per hour. :red_circle:'
+                embed.add_field(value=text)
+            elif bunker[4] - currentTime < 86400:
+                text = f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
+                    f'Supplies per hour. :yellow_circle:'
+                embed.add_field(value=text)
+            else:
+                text = f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
+                       f'Supplies per hour.'
+                embed.add_field(value=text)
+        elif bunker[3]:
+            text = f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison Supplies per ' \
+                   f'hour.'
+            embed.add_field(value=text)
+        else:
+            text = f'\n{bunker[1]} is saved in the database but has no gsupp values.'
+            embed.add_field(value=text)
+        if bunker[3]:
+            gsupptotal += bunker[3]
+    dailyCrates = gsupptotal * 24 / 150
+    text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} crates of ' \
+           f'Garrison Supplies per day.\n'
+    embed.add_field(value=text)
+    await channel.send(embed=embed)
+    db.close()
+
+
 with open('iamsosecure.txt') as f:
     content = f.readlines()[0]
 
