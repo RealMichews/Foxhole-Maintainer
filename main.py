@@ -445,7 +445,7 @@ async def auto_list_bunkers():
 
 
 @bot.command()
-async def test_embed():
+async def test_embed(ctx):
     channel = bot.get_channel(target_channel_id)
     db = sqlite3.connect('foxdb.db')
     cursor = db.cursor()
