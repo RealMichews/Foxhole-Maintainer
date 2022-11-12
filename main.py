@@ -432,7 +432,8 @@ async def auto_list_bunkers():
                            f'Supplies per hour.')
         else:
             await channel.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
-        gsupptotal += bunker[3]
+        if bunker[3]:
+            gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
     await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
                        f'crates of Garrison Supplies per day.\n'
