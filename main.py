@@ -455,6 +455,8 @@ async def test_embed(ctx):
     title = f'Hourly Maintenance Update'
     description = f'Showing bunkers for the current war {currentWar}'
     embed = discord.Embed(title=title, description=description)
+    embed.set_thumbnail(url="https://media.discordapp.net/attachments/1038473765513855006/1041057076186726470/unknown"
+                            ".png?width=1881&height=910")
     gsupptotal = 0
     for bunker in result:
         currentTime = int(time.time())
