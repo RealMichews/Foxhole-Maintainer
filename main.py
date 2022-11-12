@@ -449,7 +449,7 @@ async def auto_list_bunkers():
         if bunker[3]:
             gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
-    text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} crates of ' \
+    text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs **{dailyCrates}** crates of ' \
            f'Garrison Supplies per day.'
     embed.add_field(name="Total Consumption and Crate Usage", value=text, inline=False)
     await channel.send(embed=embed)
