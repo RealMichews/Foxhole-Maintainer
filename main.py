@@ -409,49 +409,6 @@ async def auto_list_bunkers():
     query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
     cursor.execute(query)
     result = cursor.fetchall()
-    await channel.send(f'=============================Hourly Update=============================\n')
-    await channel.send(f'Showing bunkers for the current war {currentWar}')
-    gsupptotal = 0
-    for bunker in result:
-        currentTime = int(time.time())
-        if bunker[3] and bunker[4]:
-            if bunker[4] - currentTime < 0:
-                await channel.send(
-                    f'\n{bunker[1]} is actively decaying since <t:{bunker[4]}:f> :bangbang:')
-            elif bunker[4] - currentTime < 3600:
-                await channel.send(
-                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                    f'Supplies per hour. :red_circle:')
-            elif bunker[4] - currentTime < 86400:
-                await channel.send(
-                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                    f'Supplies per hour. :yellow_circle:')
-            else:
-                await channel.send(
-                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                    f'Supplies per hour.')
-        elif bunker[3]:
-            await channel.send(f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
-                           f'Supplies per hour.')
-        else:
-            await channel.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
-        if bunker[3]:
-            gsupptotal += bunker[3]
-    dailyCrates = gsupptotal * 24 / 150
-    await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
-                       f'crates of Garrison Supplies per day.\n'
-                       f'=============================Hourly Update=============================')
-    db.close()
-
-
-@bot.command()
-async def test_embed(ctx):
-    channel = bot.get_channel(target_channel_id)
-    db = sqlite3.connect('foxdb.db')
-    cursor = db.cursor()
-    query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
-    cursor.execute(query)
-    result = cursor.fetchall()
     title = f'Hourly Maintenance Update'
     description = f'Showing bunkers for the current war {currentWar}'
     embed = discord.Embed(title=title, description=description)
@@ -464,7 +421,7 @@ async def test_embed(ctx):
             if bunker[4] - currentTime < 0:
                 name = f'{bunker[1]}:bangbang:'
                 text = f'Actively decaying since <t:{bunker[4]}:f>'
-                embed.add_field(name=name,  value=text, inline=False)
+                embed.add_field(name=name, value=text, inline=False)
             elif bunker[4] - currentTime < 3600:
                 name = f'{bunker[1]} :red_circle:'
                 text = f'Supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
@@ -473,7 +430,7 @@ async def test_embed(ctx):
             elif bunker[4] - currentTime < 86400:
                 name = f'{bunker[1]} :yellow_circle:'
                 text = f'Supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
-                    f'Supplies per hour.'
+                       f'Supplies per hour.'
                 embed.add_field(name=name, value=text, inline=False)
             else:
                 name = f'{bunker[1]}'
@@ -484,7 +441,7 @@ async def test_embed(ctx):
             name = f'{bunker[1]} :question:'
             text = f'No gsupp amount information, uses a rate of {bunker[3]} Garrison Supplies per ' \
                    f'hour.'
-            embed.add_field(name=name,value=text, inline=False)
+            embed.add_field(name=name, value=text, inline=False)
         else:
             name = f'{bunker[1]} :question::question:'
             text = f'Saved in the database but has no gsupp values.'
