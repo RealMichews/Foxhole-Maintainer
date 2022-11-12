@@ -393,7 +393,8 @@ async def auto_list_bunkers():
     query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
     cursor.execute(query)
     result = cursor.fetchall()
-    await channel.send(f'Hourly Update. Showing bunkers for the current war {currentWar}')
+    await channel.send(f'=============================Hourly Update=============================\n')
+    await channel.send(f'Showing bunkers for the current war {currentWar}')
     gsupptotal = 0
     for bunker in result:
         currentTime = int(time.time())
@@ -409,7 +410,8 @@ async def auto_list_bunkers():
         gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
     await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
-                       f'crates of Garrison Supplies per day.')
+                       f'crates of Garrison Supplies per day.\n'
+                       f'=============================Hourly Update=============================')
     db.close()
 
 
