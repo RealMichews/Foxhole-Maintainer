@@ -492,7 +492,7 @@ async def test_embed(ctx):
     dailyCrates = gsupptotal * 24 / 150
     text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} crates of ' \
            f'Garrison Supplies per day.'
-    embed.add_field(value=text)
+    embed.add_field(name="Total Consumption and Crate Usage", value=text)
     await channel.send(embed=embed)
     db.close()
 
