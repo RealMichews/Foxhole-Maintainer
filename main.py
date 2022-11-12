@@ -18,10 +18,13 @@ cursor.execute(query)
 currentWar = cursor.fetchall()[0][0]
 db.close()
 
+# Tester
 target_channel_id = 1038474625224540251
 
 
+# Sosig
 # target_channel_id = 1038473765513855006
+
 
 def calculate_timestamp(hourlyUsage, gsupps):
     hours = int(gsupps) / int(hourlyUsage)
@@ -34,6 +37,33 @@ def calculate_timestamp(hourlyUsage, gsupps):
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     auto_list_bunkers.start()
+
+
+@bot.command()
+async def helpme(ctx, *args):
+    channel = ctx.message.channel.name
+    if channel in ["test", "maintenance-bot"]:
+        if len(args) == 0:
+            await ctx.send(f'These are the currently available commands:\n\n'
+                           f'!add_bunker - This command adds a new bunker and can take between 1 to 3 parameters. Syntax:\n'
+                           f'!add_bunker NAME GSUPP/H GSUPPAMOUNT - Just Name OR Name + gsupp/H are possible\n'
+                           f'When naming a bunker only use one continuous string. OK: SOSIG_HQ NOK: SOSIG HQ\n\n'
+                           f'!update_bunker - This command updates an existing bunker - only takes 3 parameters. Syntax:\n'
+                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT\n\n'
+                           f'!update_gsupps - This command lets you update the gsupp amount for an existing bunker - '
+                           f'only takes 2 parameters. Syntax:\n'
+                           f'!update_gsupps NAME GSUPPAMOUNT\n\n'
+                           f'!delete_bunker - This command is for Officials only. Deletes an existing bunker - only '
+                           f'takes 1 parameter. Syntax:\n'
+                           f'!delete_bunker NAME\n\n'
+                           f'!list_bunkers - This command lists all bunkers for the current or selected war. '
+                           f'It can take 0 to 1 parameters. Syntax:\n'
+                           f'!list_bunkers 69 - If you do not specify a war the current war will be selected.\n\n'
+                           f'!set_war - This command is for Officials only. Updates the current war to distinguish '
+                           f'bunkers between wars. Syntax:\n!set_war 69\n'
+                           )
+        if len(args) > 0:
+            await ctx.send(f'Why the fuck did you pass a parameter to the help command?')
 
 
 @bot.command()
@@ -61,9 +91,6 @@ async def set_war(ctx, *args):
                     await ctx.send(f'The current war has been set to {args[0]}')
                 except:
                     await ctx.send('Please use a number.')
-
-
-
 
 
 @bot.command()
@@ -152,8 +179,9 @@ async def add_bunker(ctx, *args):
                 cursor.execute(query)
                 db.commit()
                 db.close()
-                await ctx.send(f'{ctx.author} has created the new bunker {args[0]} with a Garrison Supply consumption of '
-                               f'{args[1]} per hour.')
+                await ctx.send(
+                    f'{ctx.author} has created the new bunker {args[0]} with a Garrison Supply consumption of '
+                    f'{args[1]} per hour.')
             except:
                 await ctx.send('Please use a number for the hourly usage and amount of garrison supplies.')
 
@@ -183,14 +211,14 @@ async def add_bunker(ctx, *args):
             except:
                 await ctx.send('Please use a number for the hourly usage and amount of garrison supplies.')
 
-
         if len(args) > 3:
-            await ctx.send('You used the command wrong. Example: !add_bunker SOSIG_HQ 100 5000')
+            await ctx.send(f'Please enter less Variables, this command takes 1 to 3 parameters. Syntax:\n'
+                           f'!add_bunker NAME GSUPP/H GSUPPAMOUNT\nExamples:\n!add_bunker SOSIG_HQ 100 5000 \n'
+                           '!add_bunker SOSIG_HQ 50 \n!add_bunker SOSIG_HQ')
 
 
 @bot.command()
 async def update_bunker(ctx, *args):
-
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
         db = sqlite3.connect('foxdb.db')
@@ -202,11 +230,17 @@ async def update_bunker(ctx, *args):
             return cursor.fetchall()
 
         if len(args) == 0:
-            await ctx.send('Explanation')
+            await ctx.send(f'This command updates an existing bunker - only takes 3 parameters. Syntax:\n'
+                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT')
         if len(args) == 1:
-            await ctx.send('Please enter additional Variables, Explanation')
+            await ctx.send(f'Please enter additional Variables, this command only takes exactly 3 parameters. Syntax:\n'
+                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT')
         if len(args) == 2:
-            await ctx.send('Please enter additional Variables, Explanation')
+            await ctx.send(f'Please enter additional Variables, this command only takes exactly 3 parameters. Syntax:\n'
+                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT')
+        if len(args) > 3:
+            await ctx.send(f'Please enter less Variables, this command only takes exactly 3 parameters. Syntax:\n'
+                           f'!update_bunker NAME GSUPP/H GSUPPAMOUNT')
         if len(args) == 3:
             name = args[0]
             hourlyUsage = args[1]
@@ -224,18 +258,16 @@ async def update_bunker(ctx, *args):
                     cursor.execute(query)
                     db.commit()
                     db.close()
-                    await ctx.send(f'The Bunker {name} in war {currentWar} has been updated to use {hourlyUsage} Garrison '
-                                   f'Supplies per hour. With the current amount of {gsupps} Garrison Supplies it is '
-                                   f'maintained until <t:{timestamp}:f>')
+                    await ctx.send(
+                        f'The Bunker {name} in war {currentWar} has been updated to use {hourlyUsage} Garrison '
+                        f'Supplies per hour. With the current amount of {gsupps} Garrison Supplies it is '
+                        f'maintained until <t:{timestamp}:f>')
                 except:
                     await ctx.send('Please use a number for the hourly usage and amount of garrison supplies.')
 
 
-
-
 @bot.command()
 async def update_gsupps(ctx, *args):
-
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
         db = sqlite3.connect('foxdb.db')
@@ -252,9 +284,15 @@ async def update_gsupps(ctx, *args):
             return cursor.fetchall()[0][0]
 
         if len(args) == 0:
-            await ctx.send('Explanation')
+            await ctx.send(f'This command lets you update the gsupp amount for an existing bunker - '
+                           f'only takes 2 parameters. Syntax:\n'
+                           f'!update_gsupps NAME GSUPPAMOUNT')
         if len(args) == 1:
-            await ctx.send('Please enter additional Variables, Explanation')
+            await ctx.send('Please enter additional Variables, this command only takes 2 parameters. Syntax:\n'
+                           f'!update_gsupps NAME GSUPPAMOUNT')
+        if len(args) > 2:
+            await ctx.send('Please enter less Variables, this command only takes 2 parameters. Syntax:\n'
+                           f'!update_gsupps NAME GSUPPAMOUNT')
         if len(args) == 2:
             name = args[0]
             gsupps = args[1]
@@ -279,19 +317,19 @@ async def update_gsupps(ctx, *args):
 
 @bot.command()
 async def delete_bunker(ctx, *args):
-
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
         db = sqlite3.connect('foxdb.db')
         cursor = db.cursor()
 
         if len(args) == 0:
-            await ctx.send('Explanation')
+            await ctx.send(f'!delete_bunker - This command is for Officials only. Deletes an existing bunker - only '
+                           f'takes 1 parameter. Syntax:\ndelete_bunker NAME')
 
         if len(args) == 1:
 
             roles = ctx.author.roles
-            Officials = get(ctx.guild.roles, name ='Harbour Officials')
+            Officials = get(ctx.guild.roles, name='Harbour Officials')
 
             if 'Harbour Officials' not in str(roles):
                 await ctx.send(f'You are not allowed to run this command {Officials.mention}')
@@ -312,7 +350,7 @@ async def delete_bunker(ctx, *args):
                     db.close()
                     await ctx.send(f'The bunker {name} has been deleted')
         if len(args) > 1:
-            await ctx.send('Please use only one argument (Bunker name)')
+            await ctx.send('Please use only one parameter (Bunker name)')
 
 
 @bot.command()
@@ -361,21 +399,21 @@ async def auto_list_bunkers():
         currentTime = int(time.time())
         if bunker[4] - currentTime < 3600:
             await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                           f'Supplies per hour. :red_circle:')
+                               f'Supplies per hour. :red_circle:')
         elif bunker[4] - currentTime < 86400:
             await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                f'Supplies per hour. :yellow_circle:')
+                               f'Supplies per hour. :yellow_circle:')
         else:
             await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                           f'Supplies per hour.')
+                               f'Supplies per hour.')
         gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
     await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
                        f'crates of Garrison Supplies per day.')
     db.close()
 
+
 with open('iamsosecure.txt') as f:
     content = f.readlines()[0]
-
 
 bot.run(content)
