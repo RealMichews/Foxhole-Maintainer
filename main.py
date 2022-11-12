@@ -409,7 +409,8 @@ async def auto_list_bunkers():
     cursor.execute(query)
     result = cursor.fetchall()
     title = f'Hourly Maintenance Update'
-    description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone.'
+    description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. Timings can' \
+                  f'change as consumption fluctuates. Keep everything updated.'
     embed = discord.Embed(title=title, description=description)
     embed.set_thumbnail(url="https://media.discordapp.net/attachments/1038473765513855006/1041057076186726470/unknown"
                             ".png?width=1881&height=910")
