@@ -18,6 +18,10 @@ cursor.execute(query)
 currentWar = cursor.fetchall()[0][0]
 db.close()
 
+target_channel_id = 1038474625224540251
+
+
+# target_channel_id = 1038473765513855006
 
 def calculate_timestamp(hourlyUsage, gsupps):
     hours = int(gsupps) / int(hourlyUsage)
@@ -29,6 +33,7 @@ def calculate_timestamp(hourlyUsage, gsupps):
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
+    auto_list_bunkers.start()
 
 
 @bot.command()
@@ -310,10 +315,8 @@ async def delete_bunker(ctx, *args):
             await ctx.send('Please use only one argument (Bunker name)')
 
 
-@tasks.loop(minutes=5)
 @bot.command()
 async def list_bunkers(ctx, *args):
-
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
         db = sqlite3.connect('foxdb.db')
@@ -344,7 +347,35 @@ async def list_bunkers(ctx, *args):
             await ctx.send('Please only use one number.')
 
 
+@tasks.loop(hours=1)
+async def auto_list_bunkers():
+    channel = bot.get_channel(target_channel_id)
+    db = sqlite3.connect('foxdb.db')
+    cursor = db.cursor()
+    query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
+    cursor.execute(query)
+    result = cursor.fetchall()
+    await channel.send(f'Hourly Update. Showing bunkers for the current war {currentWar}')
+    gsupptotal = 0
+    for bunker in result:
+        currentTime = int(time.time())
+        if bunker[4] - currentTime < 3600:
+            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                           f'Supplies per hour. :red_circle:')
+        elif bunker[4] - currentTime < 86400:
+            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                f'Supplies per hour. :yellow_circle:')
+        else:
+            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                           f'Supplies per hour.')
+        gsupptotal += bunker[3]
+    dailyCrates = gsupptotal * 24 / 150
+    await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
+                       f'crates of Garrison Supplies per day.')
+    db.close()
+
 with open('iamsosecure.txt') as f:
     content = f.readlines()[0]
+
 
 bot.run(content)
