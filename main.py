@@ -462,37 +462,37 @@ async def test_embed(ctx):
             if bunker[4] - currentTime < 0:
                 name = f'{bunker[1]}:bangbang:'
                 text = f'Actively decaying since <t:{bunker[4]}:f>'
-                embed.add_field(name=name,  value=text)
+                embed.add_field(name=name,  value=text, inline=False)
             elif bunker[4] - currentTime < 3600:
                 name = f'{bunker[1]} :red_circle:'
                 text = f'Supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
                        f'Supplies per hour.'
-                embed.add_field(name=name, value=text)
+                embed.add_field(name=name, value=text, inline=False)
             elif bunker[4] - currentTime < 86400:
                 name = f'{bunker[1]} :yellow_circle:'
                 text = f'Supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
                     f'Supplies per hour.'
-                embed.add_field(name=name, value=text)
+                embed.add_field(name=name, value=text, inline=False)
             else:
                 name = f'{bunker[1]}'
                 text = f'Supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison ' \
                        f'Supplies per hour.'
-                embed.add_field(name=name, value=text)
+                embed.add_field(name=name, value=text, inline=False)
         elif bunker[3]:
             name = f'{bunker[1]} :question:'
             text = f'No gsupp amount information, uses a rate of {bunker[3]} Garrison Supplies per ' \
                    f'hour.'
-            embed.add_field(name=name,value=text)
+            embed.add_field(name=name,value=text, inline=False)
         else:
             name = f'{bunker[1]} :question::question:'
             text = f'Saved in the database but has no gsupp values.'
-            embed.add_field(name=name, value=text)
+            embed.add_field(name=name, value=text, inline=False)
         if bunker[3]:
             gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
     text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} crates of ' \
            f'Garrison Supplies per day.'
-    embed.add_field(name="Total Consumption and Crate Usage", value=text)
+    embed.add_field(name="Total Consumption and Crate Usage", value=text, inline=False)
     await channel.send(embed=embed)
     db.close()
 
