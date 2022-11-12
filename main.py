@@ -19,7 +19,7 @@ currentWar = cursor.fetchall()[0][0]
 db.close()
 
 # Tester
-#target_channel_id = 1038474625224540251
+# target_channel_id = 1038474625224540251
 
 # Sosig
 target_channel_id = 1038473765513855006
@@ -43,24 +43,25 @@ async def helpme(ctx, *args):
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
         if len(args) == 0:
-            await ctx.send(f'These are the currently available commands:\n\n'
-                           f'!add_bunker - This command adds a new bunker and can take between 1 to 3 parameters. '
-                           f'Syntax:\n!add_bunker NAME GSUPP/H GSUPPAMOUNT - Just Name OR Name + gsupp/H are possible\n'
-                           f'When naming a bunker only use one continuous string. OK: SOSIG_HQ NOK: SOSIG HQ\n\n'
-                           f'!update_bunker - This command updates an existing bunker - only takes 3 parameters. '
-                           f'Syntax:\n!update_bunker NAME GSUPP/H GSUPPAMOUNT\n\n'
-                           f'!update_gsupps - This command lets you update the gsupp amount for an existing bunker - '
-                           f'only takes 2 parameters. Syntax:\n'
-                           f'!update_gsupps NAME GSUPPAMOUNT\n\n'
-                           f'!delete_bunker - This command is for Officials only. Deletes an existing bunker - only '
-                           f'takes 1 parameter. Syntax:\n'
-                           f'!delete_bunker NAME\n\n'
-                           f'!list_bunkers - This command lists all bunkers for the current or selected war. '
-                           f'It can take 0 to 1 parameters. Syntax:\n'
-                           f'!list_bunkers 69 - If you do not specify a war the current war will be selected.\n\n'
-                           f'!set_war - This command is for Officials only. Updates the current war to distinguish '
-                           f'bunkers between wars. Syntax:\n!set_war 69\n'
-                           )
+            embed = discord.Embed(title="These are the currently available commands")
+            embed.add_field(name="!add_bunker", value="This command adds a new bunker and can take between 1 to 3 "
+                                                      "parameters. \nSyntax: !add_bunker NAME GSUPP/H GSUPPAMOUNT - "
+                                                      "Just Name OR Name + gsupp/H are possible\nWhen naming a bunker "
+                                                      "only use one continuous string. OK: SOSIG_HQ NOK: SOSIG HQ'")
+            embed.add_field(name="!update_bunker", value="This command updates an existing bunker - only takes 3 para"
+                                                         "meters. \nSyntax: !update_bunker NAME GSUPP/H GSUPPAMOUNT")
+            embed.add_field(name="!update_gsupps", value="This command lets you update the gsupp amount for an "
+                                                         "existing bunker - only takes 2 parameters. \n!Syntax: "
+                                                         "update_gsupps NAME GSUPPAMOUNT")
+            embed.add_field(name="!delete_bunker", value="This command is for Officials only. Deletes an existing bun"
+                                                         "ker - only takes 1 parameter. \nSyntax: !delete_bunker NAME")
+            embed.add_field(name="!list_bunkers", value="This command lists all bunkers for the current or selected "
+                                                        "war. It can take 0 to 1 parameters. \nSyntax: !list_bunkers "
+                                                        "69 - If you do not specify a war the current war will be "
+                                                        "selected.")
+            embed.add_field(name="!set_war", value="This command is for Officials only. Updates the current war to "
+                                                   "distinguish bunkers between wars. \nSyntax: !set_war 69")
+            await ctx.send(embed=embed)
         if len(args) > 0:
             await ctx.send(f'Why the fuck did you pass a parameter to the help command?')
 
@@ -366,14 +367,14 @@ async def list_bunkers(ctx, *args):
             await ctx.send(f'Showing bunkers for the current war {currentWar}')
             for bunker in result:
                 if bunker[3] and bunker[4]:
-                    await ctx.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                                   f'Supplies per hour.')
+                    await ctx.send(
+                        f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                        f'Supplies per hour.')
                 elif bunker[3]:
                     await ctx.send(f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
                                    f'Supplies per hour.')
                 else:
                     await ctx.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
-
 
         if len(args) == 1:
             try:
