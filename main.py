@@ -366,8 +366,16 @@ async def list_bunkers(ctx, *args):
             result = cursor.fetchall()
             await ctx.send(f'Showing bunkers for the current war {currentWar}')
             for bunker in result:
-                await ctx.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                               f'Supplies per hour.')
+                if bunker[3] and bunker[4]:
+                    await ctx.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                                   f'Supplies per hour.')
+                elif bunker[3]:
+                    await ctx.send(f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
+                                   f'Supplies per hour.')
+                else:
+                    await ctx.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
+
+
         if len(args) == 1:
             try:
                 tmp = int(args[0])
@@ -376,8 +384,16 @@ async def list_bunkers(ctx, *args):
                 result = cursor.fetchall()
                 await ctx.send(f'Showing bunkers for the war {args[0]}')
                 for bunker in result:
-                    await ctx.send(f'{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                                   f'Supplies per hour.')
+                    if bunker[3] and bunker[4]:
+                        await ctx.send(
+                            f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                            f'Supplies per hour.')
+                    elif bunker[3]:
+                        await ctx.send(
+                            f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
+                            f'Supplies per hour.')
+                    else:
+                        await ctx.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
             except:
                 await ctx.send('Please use a number.')
 
@@ -398,15 +414,24 @@ async def auto_list_bunkers():
     gsupptotal = 0
     for bunker in result:
         currentTime = int(time.time())
-        if bunker[4] - currentTime < 3600:
-            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                               f'Supplies per hour. :red_circle:')
-        elif bunker[4] - currentTime < 86400:
-            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                               f'Supplies per hour. :yellow_circle:')
+        if bunker[3] and bunker[4]:
+            if bunker[4] - currentTime < 3600:
+                await channel.send(
+                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                    f'Supplies per hour. :red_circle:')
+            elif bunker[4] - currentTime < 86400:
+                await channel.send(
+                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                    f'Supplies per hour. :yellow_circle:')
+            else:
+                await channel.send(
+                    f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
+                    f'Supplies per hour.')
+        elif bunker[3]:
+            await channel.send(f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
+                           f'Supplies per hour.')
         else:
-            await channel.send(f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                               f'Supplies per hour.')
+            await channel.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
         gsupptotal += bunker[3]
     dailyCrates = gsupptotal * 24 / 150
     await channel.send(f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs {dailyCrates} '
