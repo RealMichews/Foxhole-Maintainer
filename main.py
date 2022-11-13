@@ -35,7 +35,12 @@ def calculate_timestamp(hourlyUsage, gsupps):
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    auto_list_bunkers.start()
+    db = sqlite3.connect('foxdb.db')
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO TGENERIC (ATTRIBUTE, CONTENT) VALUES ('CHANNEL_ID', 1038473765513855006)")
+    #auto_list_bunkers.start()
+    db.commit()
+    db.close()
 
 
 @bot.command()
@@ -95,11 +100,6 @@ async def set_war(ctx, *args):
 
 @bot.command()
 async def add_bunker(ctx, *args):
-    """
-    !add_bunker NAME GSUPP_PER_HOUR CURRENT_GSUPPS
-    Example:
-    !add_bunker SOSIG_HQ 100 5000
-    """
 
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
@@ -353,10 +353,10 @@ async def delete_bunker(ctx, *args):
             await ctx.send('Please use only one parameter (Bunker name)')
 
 
-def bunkers(title, description):
+def bunkers(title, description, war):
     db = sqlite3.connect('foxdb.db')
     cursor = db.cursor()
-    query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
+    query = f'SELECT * FROM TBUNKER WHERE WAR = \'{war}\''
     cursor.execute(query)
     result = cursor.fetchall()
 
@@ -408,50 +408,23 @@ def bunkers(title, description):
 
 @bot.command()
 async def list_bunkers(ctx, *args):
-    channel = ctx.message.channel.name
-    if channel in ["test", "maintenance-bot"]:
-        db = sqlite3.connect('foxdb.db')
-        cursor = db.cursor()
-
-        if len(args) == 0:
-            query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
-            cursor.execute(query)
-            result = cursor.fetchall()
-            await ctx.send(f'Showing bunkers for the current war {currentWar}')
-            for bunker in result:
-                if bunker[3] and bunker[4]:
-                    await ctx.send(
-                        f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                        f'Supplies per hour.')
-                elif bunker[3]:
-                    await ctx.send(f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
-                                   f'Supplies per hour.')
-                else:
-                    await ctx.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
-
-        if len(args) == 1:
-            try:
-                tmp = int(args[0])
-                query = f'SELECT * FROM TBUNKER WHERE WAR = \'{args[0]}\''
-                cursor.execute(query)
-                result = cursor.fetchall()
-                await ctx.send(f'Showing bunkers for the war {args[0]}')
-                for bunker in result:
-                    if bunker[3] and bunker[4]:
-                        await ctx.send(
-                            f'\n{bunker[1]} is supplied until <t:{bunker[4]}:f> at a rate of {bunker[3]} Garrison '
-                            f'Supplies per hour.')
-                    elif bunker[3]:
-                        await ctx.send(
-                            f'\n{bunker[1]} has no gsupp amount information uses a rate of {bunker[3]} Garrison '
-                            f'Supplies per hour.')
-                    else:
-                        await ctx.send(f'\n{bunker[1]} is saved in the database but has no gsupp values.')
-            except:
-                await ctx.send('Please use a number.')
-
-        if len(args) > 1:
-            await ctx.send('Please only use one number.')
+    channel = bot.get_channel(target_channel_id)
+    if len(args) > 1:
+        await ctx.send('Please only use one number.')
+    if len(args) == 0:
+        title = f'Current Bunker List'
+        description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. Timings can' \
+                      f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
+                      f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
+                      f'with a :bangbang: are actively decaying.'
+        await channel.send(embed=bunkers(title, description, currentWar))
+    if len(args) == 1:
+        title = f'Current Bunker List'
+        description = f'Showing bunkers for the current war {args[0]}. Times shown are in your timezone. Timings can' \
+                      f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
+                      f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
+                      f'with a :bangbang: are actively decaying.'
+        await channel.send(embed=bunkers(title, description,args[0]))
 
 
 @tasks.loop(hours=1)
@@ -462,7 +435,7 @@ async def auto_list_bunkers():
                   f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
                   f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
                   f'with a :bangbang: are actively decaying.'
-    await channel.send(bunkers(title, description))
+    await channel.send(embed=bunkers(title, description, currentWar))
 
 
 with open('iamsosecure.txt') as f:
