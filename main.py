@@ -354,7 +354,6 @@ async def delete_bunker(ctx, *args):
 
 
 def bunkers(title, description):
-    channel = bot.get_channel(target_channel_id)
     db = sqlite3.connect('foxdb.db')
     cursor = db.cursor()
     query = f'SELECT * FROM TBUNKER WHERE WAR = \'{currentWar}\''
@@ -403,8 +402,8 @@ def bunkers(title, description):
     text = f'Our current maintenance of {gsupptotal} Garrison Supplies per hour needs **{dailyCrates}** crates of ' \
            f'Garrison Supplies per day.'
     embed.add_field(name="Total Consumption and Crate Usage", value=text, inline=False)
-    await channel.send(embed=embed)
     db.close()
+    return embed
 
 
 @bot.command()
@@ -457,12 +456,13 @@ async def list_bunkers(ctx, *args):
 
 @tasks.loop(hours=1)
 async def auto_list_bunkers():
+    channel = bot.get_channel(target_channel_id)
     title = f'Hourly Maintenance Update'
     description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. Timings can' \
                   f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
                   f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
                   f'with a :bangbang: are actively decaying.'
-    bunkers(title, description)
+    await channel.send(bunkers(title, description))
 
 
 with open('iamsosecure.txt') as f:
