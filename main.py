@@ -64,6 +64,33 @@ async def helpme(ctx, *args):
 
 
 @bot.command()
+async def set_bot_channel(ctx, *args):
+    channel = ctx.message.channel.name
+    if channel in ["test", "maintenance-bot"]:
+        roles = ctx.author.roles
+        if 'Harbour Officials' not in str(roles):
+            await ctx.send(f'You are not allowed to run this command.')
+        else:
+            db = sqlite3.connect('foxdb.db')
+            cursor = db.cursor()
+
+            if len(args) == 0:
+                await ctx.send('Please enter the bot channel id (Copy Link, last set of numbers after the slash).')
+            if len(args) > 1:
+                await ctx.send('Please only enter one number.')
+            if len(args) == 1:
+                try:
+                    tmp = int(args[0])
+                    query = f'UPDATE TGENERIC SET CONTENT = \'{args[0]}\' WHERE ATTRIBUTE = \'CHANNEL_ID\''
+                    cursor.execute(query)
+                    db.commit()
+                    db.close()
+                    await ctx.send(f'The bot channel has been set to <#{args[0]}>')
+                except:
+                    await ctx.send('Please use a number.')
+
+
+@bot.command()
 async def set_war(ctx, *args):
     channel = ctx.message.channel.name
     if channel in ["test", "maintenance-bot"]:
