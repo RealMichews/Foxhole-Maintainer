@@ -16,13 +16,10 @@ cursor = db.cursor()
 query = f'SELECT CONTENT FROM TGENERIC WHERE ATTRIBUTE = \'CURRENT_WAR\''
 cursor.execute(query)
 currentWar = cursor.fetchall()[0][0]
+query = f'SELECT CONTENT FROM TGENERIC WHERE ATTRIBUTE = \'CHANNEL_ID\''
+cursor.execute(query)
+target_channel_id = int(cursor.fetchall()[0][0])
 db.close()
-
-# Tester
-target_channel_id = 1038474625224540251
-
-# Sosig
-#target_channel_id = 1038473765513855006
 
 
 def calculate_timestamp(hourlyUsage, gsupps):
@@ -35,12 +32,7 @@ def calculate_timestamp(hourlyUsage, gsupps):
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    db = sqlite3.connect('foxdb.db')
-    cursor = db.cursor()
-    cursor.execute("INSERT INTO TGENERIC (ATTRIBUTE, CONTENT) VALUES ('CHANNEL_ID', 1038473765513855006)")
-    #auto_list_bunkers.start()
-    db.commit()
-    db.close()
+    auto_list_bunkers.start()
 
 
 @bot.command()
