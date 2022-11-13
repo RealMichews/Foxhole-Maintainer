@@ -353,7 +353,7 @@ async def delete_bunker(ctx, *args):
             await ctx.send('Please use only one parameter (Bunker name)')
 
 
-async def bunkers(title, description):
+def bunkers(title, description):
     channel = bot.get_channel(target_channel_id)
     db = sqlite3.connect('foxdb.db')
     cursor = db.cursor()
@@ -462,7 +462,7 @@ async def auto_list_bunkers():
                   f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
                   f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
                   f'with a :bangbang: are actively decaying.'
-    await bunkers(title, description)
+    bunkers(title, description)
 
 
 with open('iamsosecure.txt') as f:
