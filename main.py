@@ -18,7 +18,6 @@ configCursorGlobal = configDBGlobal.cursor()
 query = f'SELECT * FROM TGUILDDATA'
 configCursorGlobal.execute(query)
 guildList = configCursorGlobal.fetchall()
-print(guildList)
 configDBGlobal.close()
 
 
@@ -55,7 +54,6 @@ def get_war(dbName):
 
 def check_channel_allowed(guildID, targetChannelID):
     checkChannelID = None
-    print(guildList)
     for guild in guildList:
         if guild[0] == guildID:
             checkChannelID = guild[1]
@@ -128,7 +126,6 @@ async def on_guild_join(guild):
     configCursor.execute(query)
     global guildList
     guildList = configCursor.fetchall()
-    print(guildList)
     configDB.commit()
     configDB.close()
 
@@ -213,7 +210,6 @@ async def set_admin_role(ctx, *args):
             configCursor.execute(query)
             global guildList
             guildList = configCursor.fetchall()
-            print(guildList)
             configDB.close()
     else:
         await ctx.send("This command can only be used by administrators.")
@@ -241,7 +237,6 @@ async def set_bot_channel(ctx, *args):
                 configCursor.execute(query)
                 global guildList
                 guildList = configCursor.fetchall()
-                print(guildList)
                 configDB.commit()
                 configDB.close()
                 await ctx.send(f'The bot channel has been set to <#{args[0]}>')
@@ -445,7 +440,6 @@ async def update_bunker(ctx, *args):
                     timestamp = calculate_timestamp(hourlyUsage, gsupps)
                     query = f'UPDATE TBUNKER SET HOURLY_USAGE = \'{hourlyUsage}\', EXPIRY_DATE = \'{timestamp}\' WHERE NAME = ' \
                             f'\'{name}\' AND WAR = \'{currentWar}\''
-                    print(query)
                     guildCursor.execute(query)
                     guildDB.commit()
                     guildDB.close()
@@ -636,7 +630,6 @@ async def list_bunkers(ctx, *args):
 # TODO change this before pushing
 @tasks.loop(hours=1)
 async def auto_list_bunkers():
-    print("Auto RUN")
     if guildList:
         for guild in guildList:
             if guild[2] == 1:
@@ -666,7 +659,6 @@ async def start_bunker_updates(ctx):
     configCursor.execute(query)
     global guildList
     guildList = configCursor.fetchall()
-    print(guildList)
     configDB.commit()
     configDB.close()
 
@@ -682,7 +674,6 @@ async def stop_bunker_updates(ctx):
     configCursor.execute(query)
     global guildList
     guildList = configCursor.fetchall()
-    print(guildList)
     configDB.commit()
     configDB.close()
 
