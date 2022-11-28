@@ -15,8 +15,8 @@ TEST = False
 
 configDBGlobal = sqlite3.connect('config.db')
 configCursorGlobal = configDBGlobal.cursor()
-query = f'SELECT * FROM TGUILDDATA'
-configCursorGlobal.execute(query)
+queryGlobal = f'SELECT * FROM TGUILDDATA'
+configCursorGlobal.execute(queryGlobal)
 guildList = configCursorGlobal.fetchall()
 configDBGlobal.close()
 
@@ -26,16 +26,6 @@ def calculate_timestamp(hourlyUsage, gsupps):
     currentTime = int(time.time())
     newTime = currentTime + (hours * 60 * 60)
     return int(newTime)
-
-
-def get_channel(dbName):
-    db = sqlite3.connect(dbName)
-    cursor = db.cursor()
-    query = f'SELECT CONTENT FROM TGENERIC WHERE ATTRIBUTE = \'CHANNEL_ID\''
-    cursor.execute(query)
-    targetChannelID = int(cursor.fetchall()[0][0])
-    db.close()
-    return targetChannelID
 
 
 def get_db_name(guildID):
@@ -70,7 +60,6 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-
     for channel in guild.text_channels:
         if channel.permissions_for(guild.me).send_messages:
             await channel.send('Hey there! this is the Foxhole Maintainer. To set me up please use !set_admin_role'
@@ -109,6 +98,17 @@ async def on_guild_join(guild):
     else:
         query = f'INSERT INTO TGENERIC (ATTRIBUTE) VALUES (\'CURRENT_WAR\')'
         guildCursor.execute(query)
+    # TODO: think of good way to store embed pics by hex
+    '''
+    query = f'SELECT * FROM TGENERIC WHERE ATTRIBUTE = \'EMBED_PICTURE\''
+    guildCursor.execute(query)
+    result = guildCursor.fetchall()
+    if result:
+        pass
+    else:
+        query = f'INSERT INTO TGENERIC (ATTRIBUTE) VALUES (\'EMBED_PICTURE\')'
+        guildCursor.execute(query)
+        '''
     guildDB.commit()
     guildDB.close()
     configDB = sqlite3.connect('config.db')
@@ -140,25 +140,24 @@ async def helpme(ctx, *args):
             embed.add_field(name="!add_bunker", value="This command adds a new bunker and can take between 1 to 3 "
                                                       "parameters. \nSyntax: !add_bunker NAME GSUPP/H GSUPPAMOUNT - "
                                                       "Just Name OR Name + gsupp/H are possible\nWhen naming a bunker "
-                                                      "only use one continuous string. OK: SOSIG_HQ NOK: SOSIG HQ'"
-                            , inline=False)
+                                                      "only use one continuous string. OK: SOSIG_HQ NOK: "
+                                                      "SOSIG HQ'", inline=False)
             embed.add_field(name="!update_bunker", value="This command updates an existing bunker - only takes 3 para"
-                                                         "meters. \nSyntax: !update_bunker NAME GSUPP/H GSUPPAMOUNT"
-                            , inline=False)
+                                                         "meters. \nSyntax: !update_bunker NAME GSUPP/H "
+                                                         "GSUPPAMOUNT", inline=False)
             embed.add_field(name="!update_gsupps", value="This command lets you update the gsupp amount for an "
                                                          "existing bunker - only takes 2 parameters. \nSyntax: "
-                                                         "!update_gsupps NAME GSUPPAMOUNT")
+                                                         "!update_gsupps NAME GSUPPAMOUNT", inline=False)
             embed.add_field(name="!delete_bunker", value="This command is for Officials only. Deletes an existing bun"
-                                                         "ker - only takes 1 parameter. \nSyntax: !delete_bunker NAME"
-                            , inline=False)
+                                                         "ker - only takes 1 parameter. \nSyntax: !delete_bunker "
+                                                         "NAME", inline=False)
             embed.add_field(name="!list_bunkers", value="This command lists all bunkers for the current or selected "
                                                         "war. It can take 0 to 1 parameters. \nSyntax: !list_bunkers "
                                                         "69 - If you do not specify a war the current war will be "
-                                                        "selected."
-                            , inline=False)
+                                                        "selected.", inline=False)
             embed.add_field(name="!set_war", value="This command is for Officials only. Updates the current war to "
-                                                   "distinguish bunkers between wars. \nSyntax: !set_war 69"
-                            , inline=False)
+                                                   "distinguish bunkers between wars. \nSyntax: "
+                                                   "!set_war 69", inline=False)
             await ctx.send(embed=embed)
         if len(args) > 0:
             await ctx.send(f'Why the fuck did you pass a parameter to the help command?')
@@ -357,8 +356,8 @@ async def add_bunker(ctx, *args):
                 # Searching next ID to insert new Bunker
                 ID = generate_ID()
                 # Inserting into DB
-                query = f'INSERT INTO TBUNKER (ID, NAME, WAR, HOURLY_USAGE) VALUES ({ID}, \'{name}\', \'{currentWar}\', ' \
-                        f'\'{args[1]}\')'
+                query = f'INSERT INTO TBUNKER (ID, NAME, WAR, HOURLY_USAGE) VALUES ({ID}, \'{name}\', ' \
+                        f'\'{currentWar}\', \'{args[1]}\')'
                 guildCursor.execute(query)
                 guildDB.commit()
                 guildDB.close()
@@ -438,8 +437,8 @@ async def update_bunker(ctx, *args):
                     tmp = int(args[1])
                     tmp = int(args[2])
                     timestamp = calculate_timestamp(hourlyUsage, gsupps)
-                    query = f'UPDATE TBUNKER SET HOURLY_USAGE = \'{hourlyUsage}\', EXPIRY_DATE = \'{timestamp}\' WHERE NAME = ' \
-                            f'\'{name}\' AND WAR = \'{currentWar}\''
+                    query = f'UPDATE TBUNKER SET HOURLY_USAGE = \'{hourlyUsage}\', EXPIRY_DATE = \'{timestamp}\' ' \
+                            f'WHERE NAME = \'{name}\' AND WAR = \'{currentWar}\''
                     guildCursor.execute(query)
                     guildDB.commit()
                     guildDB.close()
@@ -546,6 +545,13 @@ async def delete_bunker(ctx, *args):
             await ctx.send('Please use only one parameter (Bunker name)')
 
 
+
+@bot.command()
+async def set_picture(ctx, *args):
+    #TODO make it so we can change the pic
+    pass
+
+
 def bunkers(title, description, war, dbName):
     guildDB = sqlite3.connect(dbName)
     cursor = guildDB.cursor()
@@ -554,8 +560,8 @@ def bunkers(title, description, war, dbName):
     result = cursor.fetchall()
 
     embed = discord.Embed(title=title, description=description)
-    embed.set_thumbnail(url="https://media.discordapp.net/attachments/1038473765513855006/1041057076186726470/unknown"
-                            ".png?width=1881&height=910")
+    embed.set_thumbnail(url="https://media.discordapp.net/attachments/1038473765513855006/1046248642891235378/"
+                            "SOSIG98.jpg?width=1618&height=910")
     gsupptotal = 0
     for bunker in result:
         currentTime = int(time.time())
@@ -611,20 +617,20 @@ async def list_bunkers(ctx, *args):
             await ctx.send('Please only use one number.')
         if len(args) == 0:
             title = f'Current Bunker List'
-            description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. Timings can' \
-                          f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
-                          f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
-                          f'with a :bangbang: are actively decaying.'
+            description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. ' \
+                          f'Timings can change as consumption fluctuates. Keep everything updated.\nBunkers with a ' \
+                          f':yellow_circle: run out of gsupps in 1 day.\nBunkers with a :red_circle: run out of ' \
+                          f'gsupps in 1 hour. \nBunkers with a :bangbang: are actively decaying.'
             await targetChannel.send(embed=bunkers(title, description, currentWar, dbName))
         if len(args) == 1:
             title = f'Current Bunker List'
-            description = f'Showing bunkers for the current war {args[0]}. Times shown are in your timezone. Timings can' \
-                          f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
-                          f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
-                          f'with a :bangbang: are actively decaying.'
+            description = f'Showing bunkers for the current war {args[0]}. Times shown are in your timezone. Timings ' \
+                          f'can change as consumption fluctuates. Keep everything updated.\nBunkers with a ' \
+                          f':yellow_circle: run out of gsupps in 1 day.\nBunkers with a :red_circle: run out of ' \
+                          f'gsupps in 1 hour. \nBunkers with a :bangbang: are actively decaying.'
             await targetChannel.send(embed=bunkers(title, description, args[0], dbName))
     else:
-        print("checkChannelID not found. Problema")
+        print("checkChannelID not found. Problem")
 
 
 # TODO change this before pushing
@@ -639,10 +645,10 @@ async def auto_list_bunkers():
                 currentWar = get_war(dbName)
                 channel = bot.get_channel(targetChannelID)
                 title = f'Hourly Maintenance Update'
-                description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. Timings can' \
-                              f' change as consumption fluctuates. Keep everything updated.\nBunkers with a :yellow_circle: run' \
-                              f' out of gsupps in 1 day.\nBunkers with a :red_circle: run out of gsupps in 1 hour. \nBunkers ' \
-                              f'with a :bangbang: are actively decaying.'
+                description = f'Showing bunkers for the current war {currentWar}. Times shown are in your timezone. ' \
+                              f'Timings can change as consumption fluctuates. Keep everything updated.\nBunkers with ' \
+                              f'a :yellow_circle: run out of gsupps in 1 day.\nBunkers with a :red_circle: run out ' \
+                              f'of gsupps in 1 hour. \nBunkers with a :bangbang: are actively decaying.'
                 await channel.send(embed=bunkers(title, description, currentWar, dbName))
             else:
                 pass
